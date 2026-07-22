@@ -24,11 +24,58 @@
 				letter-spacing: 0.5px;
 			}
 
+			/* ── Category Sections ── */
+			.category-section {
+				margin-bottom: 16px;
+			}
+
+			.category-header {
+				width: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				background: #1a202c;
+				color: #fff;
+				border: none;
+				border-radius: 10px;
+				padding: 14px 18px;
+				font-size: 16px;
+				font-weight: 600;
+				cursor: pointer;
+				letter-spacing: 0.3px;
+				transition: background 0.15s ease;
+			}
+
+			.category-header:hover {
+				background: #2d3748;
+			}
+
+			.category-count {
+				font-size: 12px;
+				font-weight: 400;
+				color: #a0aec0;
+				margin-left: 6px;
+			}
+
+			.chevron {
+				font-size: 13px;
+				transition: transform 0.2s ease;
+			}
+
+			.category-section.open .chevron {
+				transform: rotate(180deg);
+			}
+
 			/* ── Grid Container ── */
 			.cards-container {
-				display: grid;
+				display: none;
 				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 				gap: 18px;
+				margin-top: 16px;
+			}
+
+			.category-section.open .cards-container {
+				display: grid;
 			}
 
 			/* ── Card ── */
@@ -159,12 +206,28 @@
 			.modal-answer p:last-child {
 				margin-bottom: 0;
 			}
+
+			.modal-answer pre {
+				background: #f7fafc;
+				border: 1px solid #e2e8f0;
+				border-radius: 6px;
+				padding: 10px 12px;
+				overflow-x: auto;
+				margin-bottom: 10px;
+			}
+
+			.modal-answer pre code {
+				font-family: "Fira Code", Consolas, Menlo, monospace;
+				font-size: 12.5px;
+				color: #2d3748;
+				white-space: pre;
+			}
 		</style>
 	</head>
 	<body>
 		<h2>Interview Questions</h2>
 
-		<div class="cards-container">
+		<div id="questionsContainer">
 		</div>
 
 		<!-- ── Modal ── -->
@@ -177,190 +240,289 @@
 		</div>
 
 		<script>
-			
+
 			const questionsData = [
     {
+        "category": "JavaScript",
         "question": "Hoisting",
         "answer": "<p>\r\n\t\t\t\t\t\tHoisting is js's default behaviour of putting all the declarations\r\n\t\t\t\t\t\tto the top of current scope or current function before executing the\r\n\t\t\t\t\t\tcode.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tHoisting is the process of setting up memory space for its variables\r\n\t\t\t\t\t\tand functions; the values of variables are not stored but the\r\n\t\t\t\t\t\tfunctions are stored entirely along with their definitions.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIt's like the engine writes on a piece of paper the variables and\r\n\t\t\t\t\t\tfunctions it needs to keep track of before actually running the\r\n\t\t\t\t\t\tcode.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Closure",
         "answer": "<p>\r\n\t\t\t\t\t\tA function along with its lexical scope bundled together forms a\r\n\t\t\t\t\t\tclosure.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIn other words, a closure gives you access to an outer function's\r\n\t\t\t\t\t\tscope from an inner function.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIn JavaScript, closures are created every time a function is\r\n\t\t\t\t\t\tcreated, at function creation time.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "var / let / const",
         "answer": "<p>\r\n\t\t\t\t\t\t<strong>var</strong> — global or function scoped. Can be edited or\r\n\t\t\t\t\t\tre-declared. When hoisting happens, var declaration is initialized\r\n\t\t\t\t\t\tas <em>undefined</em>.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>let</strong> — block scoped. Can be edited but not\r\n\t\t\t\t\t\tre-declared. In hoisting, let and const variables are not\r\n\t\t\t\t\t\tinitialized (uninitialized).\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>const</strong> — block scoped. Cannot be edited or\r\n\t\t\t\t\t\tre-declared.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "null and undefined",
         "answer": "<p>\r\n\t\t\t\t\t\t<strong>null</strong> — typeof object; it's an assignment type value\r\n\t\t\t\t\t\trepresenting intentional absence.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>undefined</strong> — typeof undefined; it's when a variable\r\n\t\t\t\t\t\tis declared but no value is assigned to it.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "slice vs splice",
         "answer": "<p>\r\n\t\t\t\t\t\t<strong>splice()</strong> — returns the removed item(s) in an array.\r\n\t\t\t\t\t\tChanges the original array. Can take n number of arguments:\r\n\t\t\t\t\t\tsplice(index, count, newItem).\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>slice()</strong> — returns the selected element(s) in an\r\n\t\t\t\t\t\tarray as a new array object. Does NOT change the original array.\r\n\t\t\t\t\t\tTakes 2 arguments.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Higher-order Function",
         "answer": "<p>\r\n\t\t\t\t\t\tA higher-order function is when a function takes another function as\r\n\t\t\t\t\t\tan argument, or returns a function.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Higher Order Components (HOC)",
         "answer": "<p>\r\n\t\t\t\t\t\tA Higher Order Component is when a function takes a component as an\r\n\t\t\t\t\t\targument and returns a new component.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Block",
         "answer": "<p>\r\n\t\t\t\t\t\tA block is a place where multiple statements are grouped together so\r\n\t\t\t\t\t\tthat we can use it where JavaScript expects one single statement.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Scope",
         "answer": "<p>\r\n\t\t\t\t\t\tScope is a certain region of code where a defined variable exists\r\n\t\t\t\t\t\tand can be recognized.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIt is the current context of code — determines the accessibility of\r\n\t\t\t\t\t\tvariables and functions.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Props",
         "answer": "<p>\r\n\t\t\t\t\t\tProps are data passed from a parent component to a child component\r\n\t\t\t\t\t\tin React.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Pure Function",
         "answer": "<p>\r\n\t\t\t\t\t\tA pure function always returns the same result if the same arguments\r\n\t\t\t\t\t\tare passed.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIf you call a function n number of times and in n number of places,\r\n\t\t\t\t\t\tthe result will be the same every time.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Pure Component",
         "answer": "<p>\r\n\t\t\t\t\t\tWhen we provide the same argument it returns the same output and\r\n\t\t\t\t\t\tproduces no side effects.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tA React component is said to be pure if it renders the same output\r\n\t\t\t\t\t\tfor the same state and props.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "useState",
         "answer": "<p>\r\n\t\t\t\t\t\tuseState is a hook that lets you add state to a functional\r\n\t\t\t\t\t\tcomponent.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIt accepts an initial state as an argument and returns the current\r\n\t\t\t\t\t\tvalue of the state and a setter function to update the state.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "useEffect",
         "answer": "<p>\r\n\t\t\t\t\t\tThe useEffect Hook allows you to perform side effects in your\r\n\t\t\t\t\t\tcomponents.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tuseEffect accepts two arguments — a callback and an optional\r\n\t\t\t\t\t\tdependencies array.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p><strong>No deps array</strong> → runs on every render.</p>\r\n\t\t\t\t\t<p><strong>Empty array []</strong> → runs only on first render.</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>[deps]</strong> → runs on first render and whenever deps\r\n\t\t\t\t\t\tchange.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tThink of it as componentDidMount, componentDidUpdate, and\r\n\t\t\t\t\t\tcomponentWillUnmount combined.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Side Effect",
         "answer": "<p>\r\n\t\t\t\t\t\tA \"side effect\" is anything that affects something outside the scope\r\n\t\t\t\t\t\tof the function being executed.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tExamples: network requests, directly updating the DOM, timers,\r\n\t\t\t\t\t\tlogging, caching.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "useRef",
         "answer": "<p>\r\n\t\t\t\t\t\tThe useRef Hook lets us create mutable variables inside functional\r\n\t\t\t\t\t\tcomponents.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tCalling useRef(initialValue) returns a reference object with a\r\n\t\t\t\t\t\t<strong>current</strong> property.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>The value of the reference is persistent between re-renders.</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tUpdating a reference does NOT trigger component re-rendering (unlike\r\n\t\t\t\t\t\tstate).\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "useMemo",
         "answer": "<p>\r\n\t\t\t\t\t\tuseMemo() is a built-in React hook that accepts a compute function\r\n\t\t\t\t\t\tand a dependencies array.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tOn initial render it invokes compute, memoizes the result, and\r\n\t\t\t\t\t\treturns it.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIf dependencies don't change on re-render, useMemo returns the\r\n\t\t\t\t\t\tmemoized value without re-computing.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tReact.memo is a higher order function that takes a functional\r\n\t\t\t\t\t\tcomponent and returns an optimized version that updates only on\r\n\t\t\t\t\t\tprops change.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Redux",
         "answer": "<p>\r\n\t\t\t\t\t\t<strong>Store</strong> — container that holds the application's\r\n\t\t\t\t\t\tglobal state.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>Action</strong> — a JS object with a type and payload\r\n\t\t\t\t\t\tproperty.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>Reducer</strong> — a function that takes current state and\r\n\t\t\t\t\t\tan action object, and returns a new state.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>useDispatch</strong> — dispatches an action to the store.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>useSelector</strong> — reads/selects state from the Redux\r\n\t\t\t\t\t\tstore.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "useReducer",
         "answer": "<p>useReducer takes a reducer function and an initial state.</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tThe reducer takes the previous state and an action object (with type\r\n\t\t\t\t\t\tand payload) and returns a new state.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>Involves: reducer, actions, action creators, store.</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Component Lifecycle",
         "answer": "<p>\r\n\t\t\t\t\t\tEvery component has its own lifecycle — a series of methods invoked\r\n\t\t\t\t\t\tin different phases.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>1. Initialization</strong> — state and props initialized in\r\n\t\t\t\t\t\tconstructor.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>2. Mount</strong> — component mounted on DOM for the first\r\n\t\t\t\t\t\ttime. (componentDidMount)\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>3. Update</strong> — state and props updated by user\r\n\t\t\t\t\t\tactions. (componentDidUpdate)\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>4. Unmount</strong> — component removed from DOM.\r\n\t\t\t\t\t\t(componentWillUnmount)\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Class vs Functional Component",
         "answer": "<p>\r\n\t\t\t\t\t\t<strong>Class component</strong> — a JavaScript class that extends\r\n\t\t\t\t\t\tReact.Component with a render method. Stateful — can hold/manage\r\n\t\t\t\t\t\tlocal state.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>Functional component</strong> — a JavaScript function that\r\n\t\t\t\t\t\treturns JSX. Also known as a stateless component (before hooks).\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tClass-only lifecycle methods: getSnapshotBeforeUpdate,\r\n\t\t\t\t\t\tgetDerivedStateFromError, componentDidCatch.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Currying",
         "answer": "<p>\r\n\t\t\t\t\t\tCurrying is a function that takes one argument at a time and returns\r\n\t\t\t\t\t\ta new function expecting the next argument.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIt is a conversion of functions from callable as f(a,b,c) into\r\n\t\t\t\t\t\tcallable as f(a)(b)(c).\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tInstead of taking all arguments at once, it takes the first one and\r\n\t\t\t\t\t\treturns a new function that takes the second one, and so forth.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Promise",
         "answer": "<p>\r\n\t\t\t\t\t\tThe Promise object represents the eventual completion (or failure)\r\n\t\t\t\t\t\tof an asynchronous operation and its resulting value.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tA Promise is something we don't know the value of yet, but the value\r\n\t\t\t\t\t\twill become available in the future.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIt is one way to deal with asynchronous code without getting stuck\r\n\t\t\t\t\t\tin callback hell.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p><strong>3 states:</strong> Pending → Fulfilled / Rejected.</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tthen() — called on success. catch() — called on failure. finally() —\r\n\t\t\t\t\t\talways called.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Constructor",
         "answer": "<p>\r\n\t\t\t\t\t\tThe constructor is a method used to initialize an object's state in\r\n\t\t\t\t\t\ta class.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIt is used for initializing the local state of the component by\r\n\t\t\t\t\t\tassigning an object to this.state.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Flexbox",
         "answer": "<p>\r\n\t\t\t\t\t\tFlexbox is designed to provide consistent layout on different screen\r\n\t\t\t\t\t\tsizes.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tWith the help of flexDirection, alignItems, and justifyContent we\r\n\t\t\t\t\t\tcan achieve the right layout.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>flex</strong> — defines how items are going to fill over the\r\n\t\t\t\t\t\tavailable space along the main axis. Space is divided according to\r\n\t\t\t\t\t\teach element's flex property.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "super()",
         "answer": "<p>super() is used to call the constructor of its parent class.</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tThis is required when we need to access some variables of its parent\r\n\t\t\t\t\t\tclass.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "React Native",
         "question": "Android Manifest XML",
         "answer": "<p>\r\n\t\t\t\t\t\tThe Android Manifest is an XML file which contains important\r\n\t\t\t\t\t\tmetadata about the Android app.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tThis includes the package name, activity names, main activity (entry\r\n\t\t\t\t\t\tpoint), Android version support, hardware features support,\r\n\t\t\t\t\t\tpermissions, and other configurations.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "React Native",
         "question": "Info.plist",
         "answer": "<p>\r\n\t\t\t\t\t\tA plist file stores configuration data in a place where the system\r\n\t\t\t\t\t\tcan easily access it.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tmacOS and iOS use Info.plist files to determine what icon to display\r\n\t\t\t\t\t\tfor a bundle, what document types an app supports, and many other\r\n\t\t\t\t\t\tbehaviors that have an impact outside the bundle itself.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "React Native",
         "question": "Thread",
         "answer": "<p>\r\n\t\t\t\t\t\tA thread is a set of instructions to be executed by the CPU. It is a\r\n\t\t\t\t\t\tcomponent of a process.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>UI Thread</strong> — main application thread; has access to\r\n\t\t\t\t\t\tUI and UI can only be changed by this thread.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>JS Thread</strong> — where your JavaScript/React code lives\r\n\t\t\t\t\t\tand executes.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>Shadow Thread</strong> — background thread used by React\r\n\t\t\t\t\t\tNative to calculate layout.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "React Native",
         "question": "Native Module",
         "answer": "<p>\r\n\t\t\t\t\t\tSometimes a React Native app needs to access a native platform API\r\n\t\t\t\t\t\tnot available by default in JavaScript (e.g., Apple Pay, Google\r\n\t\t\t\t\t\tPay).\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tNative Modules allow you to reuse existing Objective-C, Swift, Java,\r\n\t\t\t\t\t\tor C++ libraries without reimplementing them in JavaScript.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "DOM",
         "answer": "<p>\r\n\t\t\t\t\t\tThe Document Object Model (DOM) is a programming interface for web\r\n\t\t\t\t\t\tdocuments.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tIt represents the page so that programs can change the document\r\n\t\t\t\t\t\tstructure, style, and content.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tThe DOM represents the document as nodes and objects so that\r\n\t\t\t\t\t\tprogramming languages can interact with the page.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Virtual DOM",
         "answer": "<p>\r\n\t\t\t\t\t\tIn React, for every DOM object, there is a corresponding \"virtual\r\n\t\t\t\t\t\tDOM object.\"\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tA virtual DOM object has the same properties as a real DOM object,\r\n\t\t\t\t\t\tbut it lacks the power to directly change what's on the screen.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tManipulating the DOM is slow. Manipulating the virtual DOM is much\r\n\t\t\t\t\t\tfaster, because nothing gets drawn onscreen. React diffs the virtual\r\n\t\t\t\t\t\tDOM and updates only what changed.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "React Native",
         "question": "React Native Bridge",
         "answer": "<p>\r\n\t\t\t\t\t\tA React Native app is made up of two sides: the JavaScript side and\r\n\t\t\t\t\t\tthe native side (Objective-C/Swift for iOS, Java/Kotlin for\r\n\t\t\t\t\t\tAndroid).\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tThe React Native Bridge allows the native code and the JavaScript\r\n\t\t\t\t\t\tcode to communicate with each other.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tWithout the bridge, there is no way for the native code to send\r\n\t\t\t\t\t\tinformation to the JavaScript code and vice versa.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Axios vs Fetch",
         "answer": "<p>Axios advantages over Fetch:</p>\r\n\t\t\t\t\t<p>• Wide browser support.</p>\r\n\t\t\t\t\t<p>• Built-in support for download progress.</p>\r\n\t\t\t\t\t<p>• Ability to intercept HTTP requests/responses.</p>\r\n\t\t\t\t\t<p>• Allows cancelling requests and request timeouts.</p>\r\n\t\t\t\t\t<p>• Auto transforms JSON data (no need to call .json()).</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Primitive Data Types",
         "answer": "<p>They are not objects and do not have any methods.</p>\r\n\t\t\t\t\t<p>Types: string, number, boolean, null, undefined, symbol.</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tStored in a stack — if we create num1=5 and assign it to num2, both\r\n\t\t\t\t\t\tare in different stack slots.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>Changing num1 will NOT update num2.</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Reference Data Types",
         "answer": "<p>Dynamic in nature and do not have a specific size.</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tMost are objects and have methods. Types: objects, functions,\r\n\t\t\t\t\t\tarrays, dates.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tActual object is stored in heap; the stack holds the\r\n\t\t\t\t\t\taddress/reference.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tTwo variables sharing the same reference — updating one will affect\r\n\t\t\t\t\t\tthe other.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "map vs forEach",
         "answer": "<p>\r\n\t\t\t\t\t\t<strong>map()</strong> — returns a new array based on the callback.\r\n\t\t\t\t\t\tYou can chain other array methods to it.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t<strong>forEach()</strong> — does not return a new array; it\r\n\t\t\t\t\t\tmodifies the primary array. Since it doesn't return anything, you\r\n\t\t\t\t\t\tcan't chain other array methods.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Spread Operator",
         "answer": "<p>\r\n\t\t\t\t\t\tThe spread operator (...) takes an array (or any iterable) and\r\n\t\t\t\t\t\tspreads its values.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tUseful for copying arrays/objects, merging arrays, and passing array\r\n\t\t\t\t\t\telements as function arguments.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "AJAX",
         "answer": "<p>\r\n\t\t\t\t\t\tWith AJAX, web applications can send and retrieve data\r\n\t\t\t\t\t\tasynchronously (in the background) without interfering with the\r\n\t\t\t\t\t\tdisplay behaviour of the existing page.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "First Class Function",
         "answer": "<p>In JavaScript, functions are treated as first-class citizens.</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tA function is treated like any other variable — you can pass a\r\n\t\t\t\t\t\tfunction as an argument, assign it to a variable, or return it from\r\n\t\t\t\t\t\tanother function.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "JavaScript",
         "question": "Callback",
         "answer": "<p>\r\n\t\t\t\t\t\tA callback function is a function passed into another function as an\r\n\t\t\t\t\t\targument, which is then invoked inside the outer function to\r\n\t\t\t\t\t\tcomplete some kind of routine or action.\r\n\t\t\t\t\t</p>"
     },
     {
+        "category": "React Native",
         "question": "Memory Leak",
         "answer": "<p>\r\n\t\t\t\t\t\tIn Android Studio you can use the Perf Monitor to check memory\r\n\t\t\t\t\t\tusage.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t1. Use image resizer. Use PNG instead of JPEG, or use WebP. Cache\r\n\t\t\t\t\t\timages locally.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\t2. Avoid unnecessary re-rendering — use Pure Component, optimize\r\n\t\t\t\t\t\tJSON data.\r\n\t\t\t\t\t</p>"
+    },
+    {
+        "category": "TypeScript",
+        "question": "any vs unknown vs never (TypeScript)",
+        "answer": "<p><strong>any</strong> — disables type checking. Can hold any value and be used without checks.</p>\r\n\t\t\t\t\t<p><strong>unknown</strong> — can hold any value, but must be narrowed (e.g. typeof check) before use. Safer than any.</p>\r\n\t\t\t\t\t<p><strong>never</strong> — represents a value that never occurs. Used for functions that always throw/loop, and for exhaustive switch checks.</p>\r\n\t\t\t\t\t<pre><code>let val: unknown = \"hi\";\nval.toUpperCase(); // Error, not narrowed\n\nif (typeof val === \"string\") {\n  val.toUpperCase(); // OK</code></pre>"
+    },
+    {
+        "category": "TypeScript",
+        "question": "interface vs type (TypeScript)",
+        "answer": "<p>Both can define object shapes; nearly identical for simple objects.</p>\r\n\t\t\t\t\t<p><strong>type</strong> — can also represent primitives, unions, tuples, and function types (interface cannot).</p>\r\n\t\t\t\t\t<p><strong>interface</strong> — supports declaration merging (re-opened and merged automatically); type does not (duplicate = error).</p>\r\n\t\t\t\t\t<p>Extending: interface uses <strong>extends</strong>; type uses <strong>&amp;</strong> (intersection).</p>\r\n\t\t\t\t\t<p>Rule of thumb: use interface for object shapes/public APIs that may be extended; use type for unions, tuples, and complex compositions.</p>\r\n\t\t\t\t\t<pre><code>interface User { name: string }\ninterface User { age: number } // merges automatically\n\ntype Status = \"loading\" | \"success\"; // interface can't do this</code></pre>"
+    },
+    {
+        "category": "TypeScript",
+        "question": "Type Narrowing (Type Guards & Discriminated Unions)",
+        "answer": "<p>Type narrowing lets TypeScript determine a more specific type from a broader type (e.g. <strong>string | number</strong>) using runtime checks.</p><p><strong>Type Guards:</strong> typeof, instanceof, in, truthiness, and custom guards.</p><p><strong>Discriminated Unions:</strong> Use a common property (like <strong>kind</strong> or <strong>type</strong>) with literal values to safely narrow union types.</p><pre><code>function print(value: string | number) {\n  if (typeof value === \"string\") {\n    console.log(value.toUpperCase());\n  }\n}</code></pre><p><strong>Interview Summary:</strong> Type narrowing allows TypeScript to safely determine a variable's type using type guards. Discriminated unions use a common literal property to narrow union members, making code safer and easier to maintain.</p>"
+    },
+    {
+        "category": "TypeScript",
+        "question": "Tuple vs Array (TypeScript)",
+        "answer": "<p><strong>Array</strong> stores values of the same type and has a dynamic length.</p><p><strong>Tuple</strong> has a fixed length and each position has a specific type.</p><pre><code>const arr: number[] = [1, 2, 3];\n\nconst user: [string, number] = [\"John\", 25];</code></pre><p><strong>Interview Summary:</strong> Arrays are best for lists of similar values with variable length. Tuples are used for fixed-size data where each index has a predefined type.</p>"
+    },
+    {
+        "category": "TypeScript",
+        "question": "What does as const do? (TypeScript)",
+        "answer": "<p><strong>as const</strong> tells TypeScript to treat a value as completely immutable and to infer the most specific (literal) types possible instead of widening them.</p><p>It also makes object properties <strong>readonly</strong> and arrays into <strong>readonly tuples</strong>.</p><pre><code>const action = {\n  type: \"INCREMENT\",\n} as const;</code></pre><p><strong>Interview Summary:</strong> <strong>as const</strong> preserves literal values, makes objects readonly, and converts arrays into readonly tuples. It is commonly used with constants and discriminated unions.</p>"
     }
 ];
 
-			const container = document.querySelector(".cards-container");
-			
-			const cardsHTML = questionsData.map(q => `
-			<div class="card" data-question="${q.question}">
-				<div class="card-question">${q.question}</div>
-				<div class="card-answer" style="display: none">
+			const categoryOrder = ["JavaScript", "TypeScript", "React Native"];
+			const categoryLabels = {
+				"JavaScript": "JS",
+				"TypeScript": "TS",
+				"React Native": "RN"
+			};
+
+			const grouped = questionsData.reduce(function (acc, q) {
+				(acc[q.category] = acc[q.category] || []).push(q);
+				return acc;
+			}, {});
+
+			const container = document.querySelector("#questionsContainer");
+
+			const sectionsHTML = categoryOrder
+				.filter(cat => grouped[cat] && grouped[cat].length)
+				.map(cat => {
+					const cardsHTML = grouped[cat].map(q => `
+					<div class="card" data-question="${q.question}">
+						<div class="card-question">${q.question}</div>
+						<div class="card-answer" style="display: none">
 ${q.answer}
-				</div>
-				<div class="card-hint">tap to expand ↗</div>
-			</div>`).join('');
-			
-			container.innerHTML = cardsHTML;
+						</div>
+						<div class="card-hint">tap to expand ↗</div>
+					</div>`).join('');
+
+					return `
+					<div class="category-section">
+						<button class="category-header" type="button">
+							<span>${categoryLabels[cat]}<span class="category-count">(${grouped[cat].length})</span></span>
+							<span class="chevron">▾</span>
+						</button>
+						<div class="cards-container">${cardsHTML}</div>
+					</div>`;
+				}).join('');
+
+			container.innerHTML = sectionsHTML;
+
+			// Toggle category open/closed
+			document.querySelectorAll(".category-header").forEach(function (header) {
+				header.addEventListener("click", function () {
+					header.closest(".category-section").classList.toggle("open");
+				});
+			});
 
 			const overlay = document.getElementById("modalOverlay");
 			const modalQ = document.getElementById("modalQuestion");

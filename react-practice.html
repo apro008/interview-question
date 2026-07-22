@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>React Practice — Searchable List w/ Debounce</title>
+
+		<!-- React + ReactDOM + Babel (in-browser JSX). No build step: just open this file. -->
+		<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+		<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+		<style>
+			* { box-sizing: border-box; margin: 0; padding: 0; }
+			body {
+				background: #f0f4f8;
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				color: #1a202c;
+				padding: 32px 16px;
+			}
+			#root { max-width: 560px; margin: 0 auto; }
+			h1 { font-size: 24px; margin-bottom: 4px; }
+			.sub { color: #64748b; font-size: 14px; margin-bottom: 24px; }
+			.search {
+				width: 100%;
+				padding: 12px 14px;
+				font-size: 16px;
+				border: 1px solid #cbd5e1;
+				border-radius: 8px;
+				outline: none;
+				transition: border-color .15s;
+			}
+			.search:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+			.meta {
+				display: flex;
+				justify-content: space-between;
+				font-size: 13px;
+				color: #64748b;
+				margin: 10px 2px 4px;
+			}
+			.spinner { color: #f59e0b; }
+			ul { list-style: none; margin-top: 8px; }
+			li {
+				background: #fff;
+				border: 1px solid #e2e8f0;
+				border-radius: 8px;
+				padding: 12px 14px;
+				margin-bottom: 8px;
+				font-size: 15px;
+			}
+			mark { background: #fde68a; border-radius: 3px; padding: 0 1px; }
+			.empty {
+				text-align: center;
+				color: #94a3b8;
+				padding: 24px;
+				font-size: 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="root"></div>
+
+		<script type="text/babel">
+			const { useState, useEffect, useMemo, useRef } = React;
+
+			// ── Sample data to search over ─────────────────────────────
+			const FRUITS = [
+				"Apple", "Apricot", "Avocado", "Banana", "Blackberry", "Blueberry",
+				"Cherry", "Coconut", "Cranberry", "Date", "Dragonfruit", "Fig",
+				"Grape", "Grapefruit", "Guava", "Kiwi", "Lemon", "Lime",
+				"Mango", "Melon", "Nectarine", "Orange", "Papaya", "Peach",
+				"Pear", "Pineapple", "Plum", "Pomegranate", "Raspberry",
+				"Strawberry", "Tangerine", "Watermelon",
+			];
+
+			// ── Reusable debounce hook ─────────────────────────────────
+			// Returns `value` only after it has stopped changing for `delay` ms.
+			function useDebounce(value, delay) {
+				const [debounced, setDebounced] = useState(value);
+				useEffect(() => {
+					const id = setTimeout(() => setDebounced(value), delay);
+					return () => clearTimeout(id); // cancel if value changes first
+				}, [value, delay]);
+				return debounced;
+			}
+
+			// Highlight the matched substring
+			function Highlight({ text, query }) {
+				if (!query) return text;
+				const i = text.toLowerCase().indexOf(query.toLowerCase());
+				if (i === -1) return text;
+				return (
+					<>
+						{text.slice(0, i)}
+						<mark>{text.slice(i, i + query.length)}</mark>
+						{text.slice(i + query.length)}
+					</>
+				);
+			}
+
+			function App() {
+				const [query, setQuery] = useState("");
+				const debouncedQuery = useDebounce(query, 300);
+				const searchCount = useRef(0);
+
+				// "typing" = user has changed input but debounce hasn't caught up yet
+				const isTyping = query !== debouncedQuery;
+
+				const results = useMemo(() => {
+					searchCount.current += 1; // count how often we actually filter
+					const q = debouncedQuery.trim().toLowerCase();
+					if (!q) return FRUITS;
+					return FRUITS.filter((f) => f.toLowerCase().includes(q));
+				}, [debouncedQuery]);
+
+				return (
+					<div>
+						<h1>Searchable List</h1>
+						<p className="sub">
+							Type to filter. Filtering is debounced by 300ms — it only runs
+							after you stop typing.
+						</p>
+
+						<input
+							className="search"
+							type="text"
+							placeholder="Search fruits…"
+							value={query}
+							onChange={(e) => setQuery(e.target.value)}
+							autoFocus
+						/>
+
+						<div className="meta">
+							<span>
+								{isTyping ? (
+									<span className="spinner">typing…</span>
+								) : (
+									`${results.length} result${results.length === 1 ? "" : "s"}`
+								)}
+							</span>
+							<span>filters run: {searchCount.current}</span>
+						</div>
+
+						{results.length === 0 ? (
+							<p className="empty">No matches for "{debouncedQuery}"</p>
+						) : (
+							<ul>
+								{results.map((f) => (
+									<li key={f}>
+										<Highlight text={f} query={debouncedQuery} />
+									</li>
+								))}
+							</ul>
+						)}
+					</div>
+				);
+			}
+
+			ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+		</script>
+	</body>
+</html>

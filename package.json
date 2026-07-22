@@ -1,0 +1,14 @@
+{
+  "name": "interview-question",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interview practice: JS/LeetCode scratchpad + React practice project",
+  "type": "commonjs",
+  "scripts": {
+    "leetcode": "node leetcode.js",
+    "watch": "node --watch leetcode.js",
+    "react": "yarn --cwd react-practice dev",
+    "react:install": "yarn --cwd react-practice install",
+    "react:build": "yarn --cwd react-practice build"
+  }
+}
