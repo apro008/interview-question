@@ -1,0 +1,20 @@
+(() => {
+  const key = 'rn-handbook-v1';
+  const stored = JSON.parse(localStorage.getItem(key) || '{"done":[],"saved":[],"dark":false}');
+  const state = { query:'', category:'', status:'', ...stored };
+  const $ = s => document.querySelector(s), esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const save = () => localStorage.setItem(key, JSON.stringify({done:state.done,saved:state.saved,dark:state.dark}));
+  const cats = [...new Set(HANDBOOK.map(x=>x.category))];
+  const byId = id => HANDBOOK.find(x=>x.id===id);
+  function match(x){const q=(x.question+' '+x.summary+' '+x.category).toLowerCase();return (!state.query||q.includes(state.query))&&(!state.category||x.category===state.category)&&(!state.status||(state.status==='bookmarked'?state.saved.includes(x.id):state.status==='completed'?state.done.includes(x.id):!state.done.includes(x.id)));}
+  function render(){
+    document.body.classList.toggle('dark',state.dark); $('#themeToggle').textContent=state.dark?'☀':'☾';
+    const shown=HANDBOOK.filter(match), groups=cats.map(c=>[c,shown.filter(x=>x.category===c)]).filter(([,x])=>x.length);
+    $('#count').textContent=shown.length; $('#bookmarks').textContent=state.saved.length;
+    $('#progressText').textContent=`${state.done.length} / ${HANDBOOK.length}`; $('#progressBar').style.width=`${state.done.length/HANDBOOK.length*100}%`;
+    $('#content').innerHTML=groups.map(([c,items])=>`<details class="section" id="${c.replaceAll(' ','-')}" open><summary class="section-title"><h2>${esc(c)}</h2><span>${items.length} question${items.length===1?'':'s'}</span></summary><div class="cards">${items.map(x=>`<details class="card"><summary><span class="num">${String(x.id).padStart(3,'0')}</span><span class="question">${esc(x.question)}</span><button class="bookmark ${state.saved.includes(x.id)?'on':''}" data-save="${x.id}" aria-label="Bookmark question">★</button></summary><div class="answer"><b>EXPLANATION</b><p>${esc(x.summary)}</p><div class="interview-answer"><b>INTERVIEW-READY ANSWER</b><p>${esc(x.interviewAnswer)}</p></div><div class="example"><b>EXAMPLE</b><br><code>${esc(x.example)}</code></div><label class="done"><input type="checkbox" data-done="${x.id}" ${state.done.includes(x.id)?'checked':''}> Mark as prepared</label></div></details>`).join('')}</div></details>`).join('');
+    $('#empty').hidden=shown.length!==0; document.querySelectorAll('[data-save]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const id=+b.dataset.save;state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];save();render()}); document.querySelectorAll('[data-done]').forEach(b=>b.onchange=()=>{const id=+b.dataset.done;state.done=b.checked?[...new Set([...state.done,id])]:state.done.filter(x=>x!==id);save();render()});
+  }
+  const opts=cats.map(c=>`<option>${esc(c)}</option>`).join(''); $('#categoryFilter').insertAdjacentHTML('beforeend',opts); $('#categoryNav').innerHTML=`<button class="active" data-cat="">All</button>${cats.map(c=>`<button data-cat="${esc(c)}">${esc(c)}</button>`).join('')}`;
+  $('#search').oninput=e=>{state.query=e.target.value.toLowerCase();render()}; $('#categoryFilter').onchange=e=>{state.category=e.target.value;render()}; $('#statusFilter').onchange=e=>{state.status=e.target.value;render()}; $('#categoryNav').onclick=e=>{if(!e.target.dataset.cat&&e.target.dataset.cat!=='')return;state.category=e.target.dataset.cat;$('#categoryFilter').value=state.category;document.querySelectorAll('#categoryNav button').forEach(x=>x.classList.toggle('active',x===e.target));render()}; $('#themeToggle').onclick=()=>{state.dark=!state.dark;save();render()}; $('#resetProgress').onclick=()=>{if(confirm('Clear all prepared questions and bookmarks?')){state.done=[];state.saved=[];save();render()}}; let open=false; $('#expandAll').onclick=()=>{open=!open;document.querySelectorAll('.card').forEach(x=>x.open=open);$('#expandAll').textContent=open?'Collapse all':'Expand all'}; render();
+})();

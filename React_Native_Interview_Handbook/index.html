@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#101827" />
+  <title>React Native Interview Handbook</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip" href="#content">Skip to questions</a>
+  <header class="hero">
+    <div><p class="eyebrow">OFFLINE INTERVIEW PREP</p><h1>React Native<br><em>Interview Handbook</em></h1><p class="subtitle">180 concise, interview-ready answers across JavaScript, TypeScript, React, React Native, and senior engineering topics.</p></div>
+    <div class="hero-actions"><button id="themeToggle" class="icon-btn" aria-label="Toggle colour theme">☾</button><button id="resetProgress" class="text-btn">Reset progress</button></div>
+  </header>
+  <main>
+    <section class="toolbar" aria-label="Handbook controls">
+      <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Search questions, answers, or topics…" autocomplete="off" /></label>
+      <div class="toolbar-row"><select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option></select><select id="statusFilter" aria-label="Filter by status"><option value="">All questions</option><option value="bookmarked">Bookmarks</option><option value="completed">Completed</option><option value="uncompleted">Not completed</option></select><button id="expandAll" class="text-btn">Expand all</button></div>
+    </section>
+    <section class="stats" aria-label="Progress"><div><strong id="count">0</strong><span>questions shown</span></div><div class="progress-wrap"><div class="progress-label"><span>Your progress</span><b id="progressText">0 / 150</b></div><div class="progress"><i id="progressBar"></i></div></div><div><strong id="bookmarks">0</strong><span>bookmarks</span></div></section>
+    <nav id="categoryNav" class="category-nav" aria-label="Categories"></nav>
+    <section id="content" aria-live="polite"></section>
+    <p id="empty" class="empty" hidden>No questions match those filters.</p>
+  </main>
+  <footer>Built for offline use · Your progress and bookmarks are stored only in this browser.</footer>
+  <script src="data.js"></script><script src="script.js"></script>
+</body>
+</html>
